@@ -1,0 +1,70 @@
+name: GitHub Metrics
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/metrics.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate GitHub metrics
+        uses: lowlighter/metrics@latest
+        with:
+          filename: github-metrics.svg
+
+          # GitHub account
+          user: vu-xuan-hung
+          token: ${{ secrets.METRICS_TOKEN }}
+
+          # Main layout — similar to the lowlighter/metrics showcase
+          template: classic
+          config_display: large
+          config_timezone: Asia/Ho_Chi_Minh
+          config_twemoji: yes
+          config_octicon: yes
+          config_animations: yes
+          config_padding: 0, 8 + 11%
+          optimize: css, xml
+
+          # Profile / repository overview
+          base: header, activity, community, repositories, metadata
+          base_indepth: yes
+          repositories_affiliations: owner, collaborator
+
+          # 3D contribution calendar
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: half-year
+
+          # Coding habits: active hours / active days / recent language activity
+          plugin_habits: yes
+          plugin_habits_from: 300
+          plugin_habits_days: 30
+          plugin_habits_facts: yes
+          plugin_habits_charts: yes
+          plugin_habits_charts_type: classic
+          plugin_habits_trim: yes
+
+          # Most-used language bar
+          plugin_languages: yes
+          plugin_languages_sections: most-used
+          plugin_languages_details: percentage
+          plugin_languages_limit: 8
+          plugin_languages_threshold: 0%
+          plugin_languages_categories: programming, markup
+          plugin_languages_colors: github
+
+          # Keep the generated SVG committed to the profile repository
+          output_action: commit
+          committer_branch: main
+          committer_message: "chore: update GitHub metrics [skip ci]"
